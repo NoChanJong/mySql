@@ -17,9 +17,17 @@ select * from emp;
 	1. DML(Data Manipulation Language, 데이터조작어)
 	
 		1) select : 자료를 조회
-		2) insert : 자료를 추가
+		2) insert : 자료를 추가 
+		insert 문 기본형태 : insert into table_name(col1, col2,....) values(value1, value2,....)
+		컬럼명(col1, con2,...)은 생략할 수 있다.
+		insert문에 select문 또한 추가할 수 있다. -> insert into ...(col1,...) selet * from ..
+		
 		3) delete : 자료를 삭제
+		기본형태 : delete from table_name where 조건
+
 		4) update : 자료를 수정
+		기본형태 : update table_name set col1 = 변경할 값, col2=변경할 값 where 조건
+
 		5) commit : CUD등의 작업을 최종적으로 확정하는 명령
 		6) rollback : CUD의 작업을 취소하는 명령
 		
@@ -30,23 +38,32 @@ select * from emp;
 		- 객체(Object)의 종류 : user, table, view, index.....
 		
 		1) create : 오라클 DB객체를 생성
+		create table_name (col1, col2,....);
 		2) drop : 오라클 DB객체를 삭제(완전삭제)
 		3) truncate : 오라클 DB객체를 삭제(데이터만 삭제)
 		4) alter : 오라클 DB객체를 수정
+		add(컬럼 추가) : alter table table_name add col
+		, modify(컬럼 수정) : alter table table_name modify col
+		, drop(컬럼 제거) : alter table table_name drop column col
+
 	
 	3. DCL(Data Control Language, 데이터 관리어)
-		 
+		
 		1) grant : 사용자에게 권한(or Role) 부여(connect, resource....)
+		grant 권한 종류1, 권한 종류2 to 권한 부여할 사용자
+
 		2) revoke: 사용자의 권한(or role)을 취소
+		revoke 권한종류1, 권한종류2 from 권한 삭제할 사용자
 		
 	B. select 문법
 	
-		select [distinc] {*, [col1 [[as] 별칭],...coln [[as] 별칭]]}
+		select [distinct] {*, [col1 [[as] 별칭],...coln [[as] 별칭]]}
 			from [스키마].table명(view명, ... [select * from 테이블명])
 		[where 조건절 [and, or, like, between....]]
 		[order by 열이름(or 표현식) [asc/desc], ... ]
 		
 		1. distinct : 중복행이 있을 경우 중복제거를 하고 한 행만 조회
+		select distinct col1, col2.... from table_name;
 		2. * : 객체의 모든 컬럼을 의미
 		3. 별칭(alias) : 객체나 걸럼명을 별칭으로 정의
 		4. where : 조건절에 만족하는 행만 출력
