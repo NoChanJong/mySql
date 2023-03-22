@@ -338,7 +338,7 @@ from dual;
 select DEPTNO from emp;
 
 select ename 
-, trunc(months_between(sysdate, HIREDATE)) 
+, trunc((sysdate - HIREDATE)+1)/365 근속년  
 , trunc(months_between(sysdate, hiredate)/12)
 , trunc(months_between(sysdate, hiredate)/12 * 365) 
 from emp
@@ -395,6 +395,259 @@ to_char(((sal*12)+comm), '$99,999'),
 to_char((((sal*12)+comm) + ((sal*12)+comm)*0.15), '$99,999')
 from emp
 where comm > 0; 
+
+/*
+	E. 기타함수
+	
+	1. nvl()    : null값을 다른 값으로 치환하는 함수 nvl(column명, 치환할 값)
+	2. nvl2()		: null값을 다른 값으로 치환하는 함수 
+								nvl2(column명, null이 아닌경우 치환할 값, null인 경우 치환할 값)
+								
+	3. decode() : 오라클에서만 사용하는 함수 if~else
+	4. case			: decode대신에 일반적으로 사용되는 문장
+	
+				case 조건 when 결과1 then 출력1,
+									[when 결과n then 출력n,]
+				 end as 별칭
+*/
+
+-- 1. nvl()
+select name, pay, bonus
+, pay+bonus as total
+, nvl(bonus, 0)
+, to_char(pay + nvl(bonus, 0), '999,999') 총급여
+from PROFESSOR
+where deptno = 201;
+
+-- 2. nvl2(col, null아니면, null이면)
+select name, pay, bonus
+, nvl2(bonus, bonus, 0) 보너스
+, nvl2(bonus, pay+bonus, pay) 총급여
+from PROFESSOR
+where deptno = 201;
+
+select ename, sal, comm
+, sal+nvl(comm, 0)
+, sal+nvl(comm, 100)
+, nvl2(comm, 'null값이 아닙니다', 'null값입니다.')
+, nvl2(comm, 'comm이 있습니다.', ename || ' 은 comm이 없습니다.')
+from emp;
+
+/* 실습 */
+-- 1. PROFESSOR 테이블에서 201번 학과 교수들의 이름과 급여, bonus, 총 연봉을 출력
+-- 		단, 총 연봉은 (pay*12+bonus)로 계산하고 bonus가 없는 교수는 0으로 계산
+select * from PROFESSOR;
+
+select name, pay, bonus
+, nvl2(bonus, pay*12 + bonus, pay*12) "총 연봉"
+from PROFESSOR
+where deptno = 201;
+-- 2. 아래 화면과 같이 emp테이블에서 deptno 가 30번인 사원들을 조회하여 comm 값이 있을 경우
+--  	'Exist'을 출력하고 comm 값이 null인 경우 'Null'을 출력
+select comm 
+, nvl2(comm, 'Exist', 'Null') "COMM 유무"
+from emp 
+where deptno = 30;
+
+-- 3. decode함수
+-- 1) 통상적으로 if~else문을 decode로 표현한 함수로 오라클에서만 사용되는 함수
+-- 2) 오라클에서 자주 사용하는 중요한 함수이다
+-- 3) decode(col, true, false) 즉, col결과(값)가 true일 경우 true실행문을 실행, 아니면 false실행문을 실행
+-- 4) decode(deptno, 101, true이면 나올값,
+-- 									 102, true이면 나올값,
+-- 									 103, true이면 나올값, false이면 나올값) -> if~else if~else
+-- 5) decode(deptno, 101, decode()...) -> 중첩 if문
+
+-- 101이면 컴퓨터공학, 아니면 기타학과
+select name, deptno
+, decode(deptno, 101, '컴퓨터공학') -- if(true) {}
+, decode(deptno, 101, '컴퓨터공학', '기타학과') -- if(true) {} else {}
+from PROFESSOR;
+
+
+select * from DEPARTMENT;
+
+-- 101 컴공, 102 미디어융합, 103 소프트공학, 나머지는 기타학과
+
+select dname, deptno
+, decode(deptno, 101, '컴퓨터공학'
+								 102, '미디어융합'
+								 103, '소프트공학'
+								    , '기타학과') -- if(true) {} else if {} else if {}
+from DEPARTMENT;
+
+-- 중첩decode
+-- 101학과교수중에서 Audie Murphy교수는 'Best Professor' 아니면 'Good', 101이외 학과교수는 N/A
+select name, deptno from PROFESSOR where deptno = 101;
+
+select name, deptno
+, decode(deptno, 101, 'Best Professor', 'N/A')
+, decode(name, 'Audie Murphy', 'Best Professor', 'Good')
+, decode(deptno, 101, decode(name, 'Audie Murphy', 'Best Professor', 'Good'), 'N/A') -- if() {} else if {}
+from PROFESSOR;
+
+-- 실습
+-- 1. student에서 전공이 101인 학생들중에 jumin 성별구분해서
+-- 1 or 3 = 남자, 2 or 4 = 여자로 출력
+-- name, jumin, gender
+-- substr, decode
+select name, substr(jumin, 7, 1) from STUDENT;
+
+select name
+, decode(substr(jumin, 7, 1), '1', '남자', '여자')
+, decode(substr(jumin, 7, 1), '1', '남자',
+'2', '여자',
+'3', '남자',
+'4', '여자')
+from STUDENT;
+
+-- STUDENT 테이블에서 1 전공이 (deptno1) 101번인 학생의 이름과
+-- 연락처와 지역을 출력. 단, 지역번호가 02는 "SEOUL",
+-- 031은 "GYEONGGI", 051은 "BUSAN", 052는 "ULSAN",
+-- 055는 "GYEONGNAM"입니다.
+-- 		substr, instr, decode
+select * from STUDENT;
+
+select tel, substr(tel, 1, instr(tel, ')', 1, 1)-1)  from STUDENT;
+
+select name, tel
+, substr(tel, 1, 3)
+, instr(tel, ')', 1, 1)
+, substr(tel, 1, instr(tel, ')', 1, 1)-1) 
+--instr(tel, ')', 1, 1)-1 : tel문자열에서 첫 번째 ')' 이전의 문자열을 추출하는 것 
+, decode(substr(tel, 1, instr(tel, ')', 1, 1)-1), 
+'02', 'SEOUL',
+'031', 'GYEONGGI',
+'051', 'BUSAN',
+'052', 'ULSAN',
+'055', 'GYEONGNAM',
+'기타') as 지역
+from STUDENT;
+
+-- 4. case문
+-- 1) case 조건 when 결과 then 출력..
+select name, tel
+, substr(tel, 1, 3)
+, instr(tel, ')', 1, 1)
+, substr(tel, 1, instr(tel, ')', 1, 1)-1)
+, decode(substr(tel, 1, instr(tel, ')', 1, 1)-1), 
+'02', 'SEOUL',
+'031', 'GYEONGGI',
+'051', 'BUSAN',
+'052', 'ULSAN',
+'055', 'GYEONGNAM',
+'기타') as 지역
+, case substr(tel, 1, instr(tel, ')', 1, 1)-1)
+			 when '02' then '서울'
+			 when '031' then '경기'
+			 when '051' then '부산'
+			 when '052' then '울산'
+			 when '055' then '경남'
+			 else '기타'
+		 end as 지역
+from STUDENT;
+
+-- 2) case when 조건 between 값1 and 값2 then 출력
+-- emp테이블에서 sal 1~1000 1등급, 1001~2000 2등급, ... 4001보다 크면 5등급
+select ename
+, sal
+, case when sal between 1 and 1000 then '1등급'
+       when sal between 1001 and 2000 then '2등급'
+			 when sal between 2001 and 3000 then '3등급'
+			 when sal between 3001 and 4000 then '4등급'
+			 when sal > 4000 then  '5등급'
+		 end as 등급
+from emp;
+
+-- 연습문제
+-- ex01) student에서 jumin에 월참조해서 해당월의 분기를 출력(1Q, 2Q, 3Q, 4Q)
+-- name, jumin, 분기 
+-- select jumin from STUDENT;
+-- select substr(jumin, 3, 2) from STUDENT;
+select name
+, jumin
+, case when substr(jumin, 3, 2) between '01' and '03' then '1Q'
+       when substr(jumin, 3, 2) between '04' and '06' then '2Q'
+			 when substr(jumin, 3, 2) between '07' and '09' then '3Q'
+			 when substr(jumin, 3, 2) > '09' then '4Q'
+		 end as 분기
+from STUDENT;
+
+-- ex02) dept에서 10=회계부, 20=연구실, 30=영업부, 40=전산실
+-- 1) decode
+select * from DEPT;
+
+select deptno, decode(deptno, 
+'10', '회계부',
+'20', '연구실',
+'30', '영업부',
+'40', '전산실')
+from dept;
+-- 2) case
+select deptno
+, case deptno 
+       when 10 then '회계부'
+       when 20 then '연구실'
+			 when 30 then '영업부'
+			 when 40 then '전산실'
+		end as 부서명
+from dept;
+-- deptno, 부서명
+
+-- ex03) 급여인상율을 다르게 적용하기
+-- emp에서 sal < 1000 0.8%인상, 1000~2000 0.5%, 2001~3000 0.3%
+-- 그 이상은 0.1% 인상분 출력
+-- ename, sal(인상전급여), 인상후급여 
+-- sign() : 값이 음수 양수 결과를 -1 0 1로 리턴
+-- 1) decode
+select sal from emp;
+
+select sign(sal - 3000) from emp;
+
+select sign(20-10), sign(20-20), sign(20-30) from dual;
+
+select ename, sal
+,decode(sign(sal - 1000),
+-1, sal*1.08,
+0, sal*1.05,
+1, decode(sign(sal - 2000),
+   -1, sal*1.05,
+	 0, sal*1.05,
+	 1, decode(sign(sal - 3000),
+	    -1, sal*1.03,
+			0, sal*1.03,
+			1, sal*1.01)))
+from emp;
+
+
+select ename
+, sal 인상전급여
+, decode(sign(sal - 3000), 
+-1, sal*0.5 + sal,
+0, sal*0.3 + sal,
+1, sal*0.1 + sal,
+sal*0.8 + sal) as 인상후급여
+from emp;
+
+-- 2) case 
+select ename
+, sal 인상전급여
+, case when sal < 1000 then sal*1.08 
+       when sal between 1000 and 2000 then sal*1.05
+			 when sal between 2001 and 3000 then sal*1.03
+			 when sal > 3000 then sal*1.01
+		 end as 급여인상
+from emp;
+
+
+
+
+
+
+
+
+
+
 
 
 
