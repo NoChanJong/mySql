@@ -175,16 +175,16 @@ order by 부서, 직급;
 -- 					상세한 정보를 반환하는 기능을 한다
 -- group by : rollup(deptno, job) -> n + 1의 그룹 생성
 -- 순서에 주의
-
+select * from emp;
 select deptno
-, nvl(job, '부서합계')
+, nvl(job, '부서합계') 직업
 , count(*) 사원수
 , round(avg(sal + nvl(comm, 0)), 0) 급여평균
-from emp
+from emp;
 group by rollup(deptno, job);
 
 select deptno
--- , nvl(job, '부서합계')
+, nvl(job, '부서합계')
 ,job
 , count(*) 사원수
 , round(avg(sal + nvl(comm, 0)), 0) 급여평균
@@ -233,6 +233,42 @@ select deptno
 , round(avg(sal + nvl(comm, 0)), 2) 평균급여
 from emp
 group by cube(deptno, job);
+
+/* 
+	GROUPING 함수 : 그룹쿼리에서 사용하는 함수로 파라미터의 평가값이 null이면 1을 리턴하고
+									null이 아닌 경우에는 0을 반환한다
+				주의사항 -> grouping 함수에서 파라미터로 들어오는 값은 반드시 
+										group by절에서 명시되어야 한다.
+
+	GROUPING_ID 함수 : GROUPING함수는 null 여부만 체크해서 0과 1을 리턴하지만,
+										 GROUPING_ID 함수는 그룹핑 레벨을 리턴한다.
+		 1) grouping_id 표현식의 값이 null인지 여부에 따라 null이 아니면 0, null이면 1을 리턴한다.
+		 2) 비트벡터로 변환한다(2진수화됨) : grouping_id(컬럼 a, 컬럼 b) 
+											a, b 둘다 조회되면 -> 00
+											a가 조회되고, b가 null이면 -> 01
+											a가 null이고, b만 조회되면 -> 10
+											둘다 조회가 안된다면 -> 11
+		 3) 10진수로 변환한후 리턴 : 00 -> 0, 01 -> 1, 10 -> 2, 11 -> 3
+		 4) grouping_id 함수도 그룹함수 이므로 having절에 조건을 명시할 수 있다.
+		 
+		주의사항 : 컬럼의 순서를 바꿔주면 비트벡터가 변해 결과값이 바뀌므로 
+						   그룹레벨을 정확히 조회하려면 순서를 맞게 배치해야 한다.
+										 
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*
 	E. 순위함수
@@ -369,6 +405,20 @@ select count(*) "생일자 합계"
 , count(case when to_char(BIRTHDAY, 'MM') ='12' then '12월' end) "12월 생일자"
 from STUDENT;
 
+select count(decode(to_char(BIRTHDAY, 'MM'), '01', 0)) || 'EA' as "1월"
+			 , count(decode(to_char(BIRTHDAY, 'MM'), '02', 0)) || 'EA' as "2월"
+			 , count(decode(to_char(BIRTHDAY, 'MM'), '03', 0)) || 'EA' as "3월"
+			 , count(decode(to_char(BIRTHDAY, 'MM'), '04', 0)) || 'EA' as "4월"
+			 , count(decode(to_char(BIRTHDAY, 'MM'), '05', 0)) || 'EA' as "5월"
+			 , count(decode(to_char(BIRTHDAY, 'MM'), '06', 0)) || 'EA' as "6월"
+			 , count(decode(to_char(BIRTHDAY, 'MM'), '07', 0)) || 'EA' as "7월"
+			 , count(decode(to_char(BIRTHDAY, 'MM'), '08', 0)) || 'EA' as "8월"
+			 , count(decode(to_char(BIRTHDAY, 'MM'), '09', 0)) || 'EA' as "9월"
+			 , count(decode(to_char(BIRTHDAY, 'MM'), '10', 0)) || 'EA' as "10월"
+			 , count(decode(to_char(BIRTHDAY, 'MM'), '11', 0)) || 'EA' as "11월"
+			 , count(decode(to_char(BIRTHDAY, 'MM'), '12', 0)) || 'EA' as "12월"
+from STUDENT;
+
 -- 3. Student 테이블의 tel 컬럼을 참고하여 아래와 같이 지역별 인원수를 출력하세요.
 --    단, 02-SEOUL, 031-GYEONGGI, 051-BUSAN, 052-ULSAN, 053-DAEGU, 055-GYEONGNAM
 --    으로 출력하세요
@@ -394,16 +444,14 @@ from emp;
 
 -- 6. student 테이블의 Tel 컬럼을 사용하여 아래와 같이 지역별 인원수와 전체대비 차지하는 비율을 
 --    출력하세요.(단, 02-SEOUL, 031-GYEONGGI, 051-BUSAN, 052-ULSAN, 053-DAEGU,055-GYEONGNAM)
-select count(*)  "합계"
-, count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='02' then 'SEOUL' end) "서울"
-, count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='031' then 'GYEONGGI' end) "경기"
-, count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='051' then 'BUSAN' end) "부산"
-, count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='052' then 'ULSAN' end) "울산"
-, count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='053' then 'DAEGU' end) "대구"
-, count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='055' then 'GYEONGNAM' end) "경남"
-, 
+select count(*) || '명(' || (count(*)/count(*)*100) || '%)' "합계"
+, count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='02' then 'SEOUL' end)/count(*)*100 || '%' as "서울"
+, count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='031' then 'GYEONGGI' end)/count(*)*100 || '%' as "경기"
+, count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='051' then 'BUSAN' end)/count(*)*100 || '%' as "부산"
+, count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='052' then 'ULSAN' end)/count(*)*100 || '%' as "울산"
+, count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='053' then 'DAEGU' end)/count(*)*100 || '%' as "대구"
+, count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='055' then 'GYEONGNAM' end)/count(*)*100 || '%' as "경남"
 from STUDENT;
-       
 
 -- 7. emp 테이블을 사용하여 부서별로 급여 누적 합계가 나오도록 출력하세요. 
 -- ( 단 부서번호로 오름차순 출력하세요. )
@@ -411,7 +459,7 @@ select * from emp;
 
 select job
 , deptno
-, sum(sal) over(partition by job order by deptno desc)
+, sum(sal) over(partition by deptno order by sal)
 from emp;
 
 -- 8. emp 테이블을 사용하여 각 사원의 급여액이 전체 직원 급여총액에서 몇 %의 비율을 
@@ -419,8 +467,8 @@ from emp;
 select deptno
 , ename 
 , sal 
-, sum(sal) over() 전체직원급여합계
-, round((ratio_to_report(sal) over()) * 100, 2)
+, sum(sum(sal)) over() 전체직원급여합계
+, round((ratio_to_report(sum(sal)) over()) * 100, 2)
 from emp
 group by deptno, ename, sal
 order by sal desc;
@@ -432,11 +480,11 @@ select * from emp;
 select deptno
 , ename
 , sal
-, sum(sal) over(order by deptno) 
-, round((ratio_to_report(sal) over())*100, 2)
+, sum(sum(sal)) over(partition by deptno order by sal) 부서합계
+, round((ratio_to_report(sum(sal)) over(partition by deptno))*100, 2) 
 from emp
 group by deptno, ename, sal
-order by deptno desc;
+order by 1;
 
 
 

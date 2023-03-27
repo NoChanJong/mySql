@@ -131,8 +131,12 @@ where emp.mgr = mgr.empno;
 select * from STUDENT;
 select * from DEPARTMENT;
 
-select std.name, dpt.deptno, std.deptno1 
+select std.name, dpt.deptno, dpt.dname 
 from student std inner join department dpt on std.deptno1 = dpt.deptno;
+
+select std.name 학생이름, dpt.deptno 학과번호, dpt.dname "1전공학과명"
+from STUDENT std, department dpt
+where std.deptno1 = dpt.deptno;
 
 -- ex02) emp2, p_grade에서 현재 직급의 사원명, 직급, 현재 년봉, 해당직급의 하한
 --       상한금액 출력 (천단위 ,로 구분)
@@ -141,7 +145,13 @@ select * from p_grade;
 
 select emp2.name, emp2.position, emp2.pay, gra.s_pay, gra.e_pay
 from emp2 emp2 inner join p_grade gra on emp2.position = gra.position;
-    
+
+select e.name, e.position 
+		 , to_char(e.pay, '999,999,999')
+		 , to_char(gra.s_pay, '999,999,999')
+     , to_char(gra.e_pay, '999,999,999')
+from emp2 e, p_grade gra
+where e.position = gra.position;
 -- ex03) emp2, p_grade에서 사원명, 나이, 직급, 예상직급(나이로 계산후 해당 나이의
 --       직급), 나이는 오늘날자기준 trunc로 소수점이하 절삭 
 select emp2.name
@@ -150,6 +160,13 @@ select emp2.name
 , gra.position
 from emp2 emp2, p_grade gra
 where trunc(months_between(sysdate, emp2.birthday)/12) between gra.S_AGE and gra.E_AGE; 
+
+select emp.name
+, trunc((sysdate - emp.birthday) / 365, 0) 나이
+, emp.position 현재직급
+, gra.position 예상직급
+from emp2 emp, p_grade gra
+where trunc((sysdate - emp.birthday) / 365, 0) between gra.s_age and gra.e_age;
 
 -- ex04) customer, gift 고객포인트보나 낮은 포인트의 상품중에 Notebook을 선택할
 --       수 있는 고객명, 포인트, 상품명을 출력    
@@ -167,13 +184,33 @@ and g.gname = 'Notebook';
 --       단, 입사일이 빠른 사람수를 오름차순으로
 select * from PROFESSOR;
 
-select pro1.profno, pro1.name, 
-			 to_char(pro1.hiredate, 'YYYY/MM/DD')
+select pro1.profno, pro1.name
+			 , to_char(pro1.hiredate, 'YYYY/MM/DD') 
 			 , count(nvl2(pro2.profno, pro1.profno, null)) 인원수
 from PROFESSOR pro1, PROFESSOR pro2
 where pro1.hiredate > pro2.hiredate(+)
 group by pro1.profno, pro1.name, pro1.hiredate
 order by 인원수 asc;
+
+-- oracle
+select pr1.profno 교수번호
+, pr1.name 교수명
+, to_char(pr1.hiredate, 'YYYY.MM.DD') 입사일자
+, count(pr2.hiredate) 인원수
+from PROFESSOR pr1, PROFESSOR pr2
+where pr2.HIREDATE(+) < pr1.hiredate
+group by pr1.profno, pr1.name, pr1.hiredate
+order by 4;
+
+-- ansi
+select pr1.profno 교수번호
+, pr1.name 교수명
+, to_char(pr1.hiredate, 'YYYY.MM.DD') 입사일자
+, count(pr2.hiredate) 인원수
+from PROFESSOR pr1 left outer join  PROFESSOR pr2
+on pr2.HIREDATE < pr1.hiredate
+group by pr1.profno, pr1.name, pr1.hiredate
+order by 4;
  
 -- ex06) emp에서 사원번호, 사원명, 입사일 자신보다 먼저 입사한 인원수를 출력
 --       단, 입사일이 빠른 사람수를 오름차순 정렬
@@ -186,7 +223,15 @@ where e1.hiredate > e2.hiredate(+)
 group by e1.empno, e1.ename, e1.hiredate
 order by 인원수 asc; 
 
-
+select e1.empno
+, e1.ename
+, to_char(e1.hiredate, 'YYYY.MM.DD')
+, count(e2.hiredate)
+from emp e1, emp e2
+where e2.hiredate(+) < e1.hiredate
+and e1.hiredate is not null
+group by e1.empno, to_char(e1.hiredate, 'YYYY.MM.DD'), e1.ename
+order by 4;
 
 
 
