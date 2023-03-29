@@ -253,7 +253,29 @@ group by cube(deptno, job);
 		 
 		주의사항 : 컬럼의 순서를 바꿔주면 비트벡터가 변해 결과값이 바뀌므로 
 						   그룹레벨을 정확히 조회하려면 순서를 맞게 배치해야 한다.
-										 
+	
+	GROUPING SETS : group by의 확장된 형태로 하나의 group by절에 여러개의 
+									그룹 조건을 기술할 수 있다.
+	   1) grouping sets 함수의 결과는 각 그룹 조건에 대해 별도로 group by한 결과를
+				union all한 결과와 동일하다.
+		 2) union all등을 사용하여 복잡하게 sql문장을 작성했던 것을 간단하게 한 문장
+				으로 해결할 수 있다.
+				
+		 예) grouping sets 예제
+		 
+				 select deptno, jobm sum(sal)
+				 from emp
+				 group by grouping sets(deptno, job);
+				 
+				 union all을 사용한 예제
+				 
+				 select null deptno, job, sum(sal)
+				 from emp
+				 group by job
+				 union all
+				 select deptno, null job, sum(sal)
+				 from emp
+				 group by deptno;										 
 */
 
 
