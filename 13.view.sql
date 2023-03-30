@@ -16,7 +16,7 @@
   3. with read only옵션으로 설정된 view는 어떠한 데이터를 갱신할 수 없다.
 	4. with check option을 설정한 view는 view조건에 해당되는 데이터만 삽입, 삭제, 수정
 		 할 수 있다.
-		 a
+		 aa
   view 문법
 	
 	create [or replace] [force|noforce] view 뷰이름 as

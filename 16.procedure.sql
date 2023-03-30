@@ -20,7 +20,7 @@
 		6) exception처리를 이용하여 oracle server error처리를 할 수 있다.
 		7) 사용자가 에러를 정의할 수도 있고 exception처리를 할수 있다.
 	
-	
+	a
 	2. PL/SQL의 구조
 
 		1) PL/SQL은 프로그램을 논리적인 블럭으로 나눈 구조화된 언어이다.
