@@ -15,7 +15,7 @@
 												부모테이블에 PK에 없는 값이 자식테이블에 입력되지 못하게 하는 조건
 	5. CHECK			 (CK) : 설정된 값만 입력이 되도록 하는 조건
 */
--- 1. 테이블 생성시에 지정
+-- 1. 테이블 생성시에 지정 a
 -- 1) 정식문법
 create table new_emp_1 (
 	no  	number(4)        constraint emp_no_pk primary key
