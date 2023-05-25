@@ -9,7 +9,7 @@
 	PL/SQL에서 자체 compile엔진을 가지고 있다.
 	
 	1. PL/SQL의 장점
-	a
+	
 		1) block구조로 다수의 SQL문을 한번에 Oracle DB서버로 전송해서 처리하기 때문에
 			 처리속도가 빠르다
 	  2) PL/SQL의 모든 요소는 하나 또는 두개이상의 블럭으로 구성하여 모듈화가 가능하다.
@@ -20,7 +20,7 @@
 		6) exception처리를 이용하여 oracle server error처리를 할 수 있다.
 		7) 사용자가 에러를 정의할 수도 있고 exception처리를 할수 있다.
 	
-	a
+	
 	2. PL/SQL의 구조
 
 		1) PL/SQL은 프로그램을 논리적인 블럭으로 나눈 구조화된 언어이다.
