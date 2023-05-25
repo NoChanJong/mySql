@@ -16,7 +16,7 @@
   3. with read only옵션으로 설정된 view는 어떠한 데이터를 갱신할 수 없다.
 	4. with check option을 설정한 view는 view조건에 해당되는 데이터만 삽입, 삭제, 수정
 		 할 수 있다.
-		 aa
+
   view 문법
 	
 	create [or replace] [force|noforce] view 뷰이름 as
@@ -139,8 +139,6 @@ and e.deptno = dpt.deptno;
 select * from v_test2;
 
 -- 7. inline view 
-
-
 select emp.ename, dpt.dname
 from emp emp, dept dpt
 where emp.deptno = dpt.deptno;
@@ -201,6 +199,7 @@ order by emp.deptno;
 select * from v_max_sal_02;
 
 -- inline view(inline view에 group by 사용)
+
 select * from emp;
 
 create or replace view v_max_sal_03 as
@@ -360,6 +359,7 @@ order by ceil(rownum/3);
 	not like : 문자 형태와 일치하지 않는 데이터를 출력
 	is not null : null값을 갖지 않는 데이터를 출력
 */
+
 
 
 

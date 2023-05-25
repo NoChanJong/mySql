@@ -5,7 +5,7 @@ alter user hr account unlock;
 select * from tab;
 
 /*
-	Oracle 기본 date형식 변경하기
+	Oracle 기본 date형식 변경하기a
 */
 
 -- 1. 오라클 환경변수 조회하기

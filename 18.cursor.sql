@@ -11,7 +11,7 @@
 		 
 		 묵시적커서의 정의는 pl/sql 블럭의 begin~end에 sql문이 있다면 pl/sql은 "SQL"이라는 이름의
 		 커서를 자동으로 생성한다.	 
-	
+	s
 	2. Cursor의 종류
 		 1) 묵시적(암묵적, implicit) 커서
 		 

@@ -8,14 +8,19 @@
 	제약조건의 종류
 	
 	1. not null    (NN) : null값이 입력되지 못하게 하는 조건
+
 	2. unique			 (UK) : UK로 설정된 컬럼에는 중복된 값을 허용하지 않는 조건/자동으로 인덱스가 생성됨
+
 	3. primary key (PK) : not null + unique인 컬럼, PK는 테이블당 한 개의 PK만 정의가능
 												PK는 한 개 이상의 컬럼을 묶어서 한개의 PK로 지정할 수 있다.
 	4. forign key  (FK) : 부모 테이블의 PK인 컬럼을 참조(reference)하도록 하는 조건
 												부모테이블에 PK에 없는 값이 자식테이블에 입력되지 못하게 하는 조건
 	5. CHECK			 (CK) : 설정된 값만 입력이 되도록 하는 조건
-*/a
--- 1. 테이블 생성시에 지정 a
+*/
+-- 1. 테이블 생성시에 지정 
+
+-- 1. 테이블 생성시에 지정
+>>>>>>> 1a0983907dd059c07a196fad610134ef001f5dc9
 -- 1) 정식문법
 create table new_emp_1 (
 	no  	number(4)        constraint emp_no_pk primary key
@@ -47,7 +52,10 @@ select * from new_emp_2;
 -- data dictionary : xxx_constraints
 select * from all_constraints;
 select * from user_constraints
+
 select * from user_cons_columns;
+
+
 where table_name like 'NEW_EMP%';
 
 -- 실습1. 데이터 추가하기 (제약조건 테스트)

@@ -11,7 +11,7 @@
 	
 		select t1.ename, t2.ename
 			from emp t1 [inner|outer|full]join dept t2 on t1.deptno = t2.deptno
-	
+	a
 */
 
 select deptno, ename from emp;

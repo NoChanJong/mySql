@@ -11,7 +11,7 @@
 	4. 시퀀스는 테이블과 독립적으로 저장되고 생성된다.
 
 	[sequence 문법]
-	
+	s
 	1. create sequence 시퀀스명
 		 [start with n]  	 				 -- 생략하면 기본값 1
 		 [increment by n]	 				 -- 생략하면 기본값 1	 

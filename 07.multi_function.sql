@@ -279,6 +279,21 @@ group by cube(deptno, job);
 */
 
 
+<<<<<<< HEAD
+
+
+
+
+
+
+
+
+
+
+
+
+
+>>>>>>> 1a0983907dd059c07a196fad610134ef001f5dc9
 /*
 	E. 순위함수
 	
@@ -432,12 +447,21 @@ from STUDENT;
 --    단, 02-SEOUL, 031-GYEONGGI, 051-BUSAN, 052-ULSAN, 053-DAEGU, 055-GYEONGNAM
 --    으로 출력하세요
 select count(*)  "합계"
+<<<<<<< HEAD
 , count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='02' then 'SEOUL' end ) || '명' as "서울"
 , count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='031' then 'GYEONGGI' end) || '명' as "경기"
 , count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='051' then 'BUSAN' end) || '명' as "부산"
 , count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='052' then 'ULSAN' end) || '명' as "울산"
 , count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='053' then 'DAEGU' end) || '명' as "대구"
 , count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='055' then 'GYEONGNAM' end) || '명' as "경남"
+=======
+, count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='02' then 'SEOUL' end) "서울"
+, count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='031' then 'GYEONGGI' end) "경기"
+, count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='051' then 'BUSAN' end) "부산"
+, count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='052' then 'ULSAN' end) "울산"
+, count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='053' then 'DAEGU' end) "대구"
+, count(case when substr(tel, 1, instr(tel, ')', 1, 1)-1)='055' then 'GYEONGNAM' end) "경남"
+>>>>>>> 1a0983907dd059c07a196fad610134ef001f5dc9
 from STUDENT;
 
 
@@ -449,8 +473,12 @@ select * from emp;
 select ename
 , sal 급여
 , sum(sal) over(order by sal) 누적급여금액
+<<<<<<< HEAD
 from emp
 order by 1;
+=======
+from emp;
+>>>>>>> 1a0983907dd059c07a196fad610134ef001f5dc9
 
 -- 6. student 테이블의 Tel 컬럼을 사용하여 아래와 같이 지역별 인원수와 전체대비 차지하는 비율을 
 --    출력하세요.(단, 02-SEOUL, 031-GYEONGGI, 051-BUSAN, 052-ULSAN, 053-DAEGU,055-GYEONGNAM)

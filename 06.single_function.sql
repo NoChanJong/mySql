@@ -2,7 +2,7 @@
 	단일행함수(single function)
 	
 	A. 문자함수
-	
+	s
 	1. upper/lower : 대소문자변경함수 upper('abcde') -> ABCDE , lower('ABC') -> abc
 	2. initcap : 첫 글자를 대문자로 변환, 나머지는 소문자 initcap('aBcDe') -> Abcde
 	3. length : 문자열의 길이를 리턴 length('abcd') -> 4, length('한글') -> 2

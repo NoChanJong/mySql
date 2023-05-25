@@ -14,7 +14,7 @@
 	1. 연관성에 따른 분류
 		a. 연관성이 있는 쿼리
 		b. 연관성이 없는 쿼리
-	 aa
+
 	2. 위치에 따른 분류
 		a. inline view : select절이나 from절안에 위치하는 쿼리
 		b. 중첩쿼리		 : where절에 위치한 쿼리
@@ -77,6 +77,7 @@ select first_name || '.' || last_name 사원명
 , emp.department_id 부서번호
 , (select department_name from hr.departments dpt where emp.department_id = dpt.department_id) 부서명
 from hr.employees emp;
+
 
 -- 실습3. hr계정에서 사원테이블에서 평균급(전체사원)보다 작은 사원만 출력
 -- 단일행, 단일컬럼
@@ -258,60 +259,3 @@ select emp.first_name || '.' || emp.last_name 사원명
 , emp.salary
 from hr.EMPLOYEES emp
 where emp.salary >all (select salary from hr.EMPLOYEES where department_id = 30);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

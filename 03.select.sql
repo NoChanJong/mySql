@@ -12,7 +12,7 @@ select * from dept;
 select * from emp;
 
 /*
-	A. SQL문의 종류
+	A. SQL문의 종류s
 
 	1. DML(Data Manipulation Language, 데이터조작어)
 	
