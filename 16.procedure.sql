@@ -155,7 +155,599 @@ end;
 		
 			 v_emp_row		emp%rowtype;
 			  --> v_emp.ename;
+				
+	4. table타입
+	
+	   pl/sql에서 table타입은 db에서의 table과 성격이 다르다. pl/sql에서 table은 1차원 배열이다.
+		 table은 크기에 제한이 없으며 row의 수는 데이터가 추가되면 자동으로 증가된다.
+		 binary_integer타입의 인덱스번호로 순서가 정해진다. 하나의 테이블에는 한개의 컬럼데이터를
+		 저장할 수 있다.
+		 
+		 선언방법
+		 
+		 1) 데이터타입(테이블)선언
+				
+				type 테이블타입명 is table of varchar2(20) index by binary_integer; -> 사용자가 데이터타입을 새로 만든 것
+		 
+		 2) 변수선언
+				
+				tab_emp_name		테이블타입명;	 --> 사용자가 만든 새로운 데이터타입(테이블타입)으로 변수를 선언
+				즉, 변수선언의 의미는 테이블타입으로 변수를 선언한다는 의미이다.
+				
+		 3) %rowtype으로 table타입을 선언
+				
+				type 테이블타입명 is table of emp%rowtype index by binary_integer;
+				
+				tab_emp 테이블타입명
+		 
+  5. record타입
+	
+		 1) record 데이터타입은 여러개의 데이터타입을 갖는 변수들의 집합
+		 2) 스칼라, 테이블 or 레코드타입중 하나 이상의 요소로 구성
+		 3) 논리적 단위로 컬럼들의 집합을 처리할 수 있도록 한다.
+		 4) pl/sql table과는 다르게 개별 필드의 이름을 부여, 선언시에 초기화가 가능하다.
+		 5) 선언방법
+			
+				type 레코드타입명 is record(
+					col1 	데이터타입 [not null {:= 값 | 표현식}],
+					  .
+						.
+						.
+						.
+				  coln 	데이터타입 [not null {:= 값 | 표현식}],					
+				);
+	
 */
+-- pl/sql에서 사용되는 select문법은 일반 sql의 select문법과는 다르다.
+-- a. 일반 sql
+select * from emp;
+
+-- b. pl/sql에서의 문법
+select col1,....coln into var1,....varn
+from emp;
+
+-- 1. 스칼라데이터타입
+-- 1) 일반 데이터타입 vs %type
+create or replace procedure pro_05 is
+	v_empno			number;							-- 일반타입
+	v_ename		  emp.ename%type;			-- 참조타입 %type
+	v_sal				emp.sal%type;				-- 참조타입 %type
+begin
+-- 한개의 사원정보만 읽어서 출력
+	select emp.empno, emp.ename, emp.sal
+	into v_empno, v_ename, v_sal
+	from emp 
+	where emp.ename = 'SMITH'; 
+	
+	dbms_output.put_line('사원번호 = ' || v_empno);
+	dbms_output.put_line('사원이름 = ' || v_ename);
+	dbms_output.put_line('사원급여 = ' || v_sal);
+end;
+
+-- 2. %rowtype
+create or replace procedure pro_06 is
+	v_emp_row			emp%rowtype;
+begin
+select *
+into v_emp_row
+from emp
+where emp.empno = 7369;
+
+dbms_output.put_line('사원번호 = ' || v_emp_row.empno);
+dbms_output.put_line('사원번호 = ' || v_emp_row.ename);
+dbms_output.put_line('사원번호 = ' || v_emp_row.sal);
+dbms_output.put_line('커미션 = ' || v_emp_row.comm);
+dbms_output.put_line('입사일자 = ' || v_emp_row.hiredate);
+dbms_output.put_line('부서번호 = ' || v_emp_row.deptno);
+end;
+
+-- 3. record type
+-- record : empno, ename, sal, hiredate을 저장할 데이터타입을 선언
+-- type 레코드명 is record(col1 데이터타입, ......coln 데이터타입);
+create or replace procedure pro_07 is
+-- 1st step : 사용자가 새롭게만든 데이터타입 작성
+	type emp_rec is record(
+	v_empno				number
+,	v_ename				varchar2(30)
+,	v_sal					number
+,	v_hiredate		date
+	); 
+
+	-- 2nd step : 변수선언
+	v_emp_rec			emp_rec;
+begin
+
+	select empno, ename, sal, hiredate
+	into v_emp_rec.v_empno, v_emp_rec.v_ename, v_emp_rec.v_sal, v_emp_rec.v_hiredate
+	from emp
+	where emp.ename = 'KING';
+
+dbms_output.put_line('사원번호 = ' || v_emp_rec.v_empno);
+dbms_output.put_line('사원이름 = ' || v_emp_rec.v_ename);
+dbms_output.put_line('사원급여 = ' || v_emp_rec.v_sal);
+dbms_output.put_line('입사일자 = ' || v_emp_rec.v_hiredate);
+dbms_output.put_line('----------------------------------------');
+
+select empno, ename, sal, hiredate
+	into v_emp_rec
+	from emp
+	where emp.ename = 'KING';
+	
+	dbms_output.put_line('사원번호 = ' || v_emp_rec.v_empno);
+dbms_output.put_line('사원이름 = ' || v_emp_rec.v_ename);
+dbms_output.put_line('사원급여 = ' || v_emp_rec.v_sal);
+dbms_output.put_line('입사일자 = ' || v_emp_rec.v_hiredate);
+end;
+
+-- 4. table 타입(한건, 한개의 컬럼을 정의)
+-- type 테이블타입명 is table of 테이블한개의 컬럼 index by binary_integer;
+-- 1차원배열과 유사
+create or replace procedure pro_08 is
+	-- 1st step : table 타입 작성
+	type tbl_emp_name is table of hr.employees.first_name%type index by binary_integer;
+	
+	-- 2nd step : 변수선언
+	v_name 		tbl_emp_name;
+  v_name_1	varchar2(20);
+begin
+
+select first_name 
+into v_name_1
+from hr.employees
+where employee_id = 100;
+
+dbms_output.put_line('사원이름 = ' || v_name_1);
+dbms_output.put_line('----------------------------------------');
+
+v_name(0) := v_name_1;
+v_name(1) := '홍길동';
+v_name(2) := '손흥민';
+
+dbms_output.put_line('사원이름 = ' || v_name(0));
+dbms_output.put_line('사원이름 = ' || v_name(1));
+dbms_output.put_line('사원이름 = ' || v_name(2));
+
+end;
+
+-- 5. table 타입(여러건, 한개의 컬럼을 정의)
+create or replace procedure pro_09 is
+	-- 1st step : table 타입 작성
+	type e_table_type is table of hr.EMPLOYEES.first_name%type index by binary_integer;
+	
+	-- 2nd step : 변수선언
+	v_tab_type		e_table_type; -- 배열
+	idx						binary_integer := 0;
+begin
+
+for name in (select first_name || ' ' || last_name as empname from hr.EMPLOYEES order by 1) loop
+idx := idx + 1;
+v_tab_type(idx) := name.empname; -- name -> %rowtype으로 처리
+end loop;
+
+for i in 1..idx loop
+dbms_output.put_line('사원이름 = ' || v_tab_type(i));
+end loop;
+end;
+
+-- 6. table 타입(여러건, 여러개의 컬럼을 정의)
+-- emp테이블에서 사원명과 직급 출력
+select * from emp;
+create or replace procedure pro_10 is
+	type tab_name_type is table of emp.ename%type index by binary_integer;
+	type tab_job_type is table of emp.job%type index by binary_integer;
+	
+	v_name_table 		tab_name_type;
+	v_job_table			tab_job_type;
+	
+	idx							binary_integer := 0;
+begin
+
+for name_job in (select ename, job from emp order by ename) loop
+	idx := idx + 1;
+	v_name_table(idx) := name_job.ename;
+	v_job_table(idx) := name_job.job;
+end loop;
+
+
+	dbms_output.put_line('---------------------------------');
+	dbms_output.put_line('사원이름 = ' || chr(9) || '직급');
+	dbms_output.put_line('---------------------------------');
+	
+	for i in 1..idx loop
+		dbms_output.put_line(v_name_table(i) || chr(9) || v_job_table(i));
+	end loop;
+	
+	exception when others then
+		dbms_output.put_line('에러');
+end;
+
+-- 실습1. hr.employees 와 hr.departments 읽어서 
+-- 사원이름(first_name.last_name)과 부서명을 출력
+-- 사원이름 chr(9) 부서이름
+select * from hr.EMPLOYEES;
+select * from hr.DEPARTMENTS;
+create or replace procedure pro_a is
+type tab_empname_type is table of hr.EMPLOYEES.first_name%type index by binary_integer;
+type tab_dptname_type is table of hr.DEPARTMENTS.DEPARTMENT_NAME%type index by binary_integer;
+
+v_name 				tab_empname_type;
+v_dpt					tab_dptname_type;
+
+idx 					binary_integer := 0;
+
+begin
+
+for emp_name in (select department_name, first_name || ' ' || last_name as fullname from hr.EMPLOYEES e, hr.DEPARTMENTS d where e.DEPARTMENT_ID = d.DEPARTMENT_ID order by first_name) loop
+	idx := idx + 1;
+	v_name(idx) := emp_name.fullname;
+	v_dpt(idx) := emp_name.department_name;
+end loop;
+
+	dbms_output.put_line('----------------------------------');
+	dbms_output.put_line('사원이름' || chr(9) || '부서이름');
+	dbms_output.put_line('----------------------------------');
+	
+for i in 1..idx loop
+	dbms_output.put_line(v_name(i) || chr(9) || v_dpt(i));
+end loop;
+
+end;
+
+-- 7. table 타입을 %rowtype을 선언
+-- dept테이블의 내용을 출력
+create or replace PROCEDURE pro_11 is
+type t_dept is table of dept%rowtype index by binary_integer;
+
+v_dept				t_dept;
+idx						binary_integer := 0;
+
+begin
+
+for dept_list in (select * from dept order by dname) loop
+	idx := idx + 1;
+	v_dept(idx) := dept_list;
+end loop;
+
+for i in 1..idx loop
+	dbms_output.put_line('부서번호 = ' || v_dept(i).deptno || chr(9) || 
+											 '부서이름 = ' || v_dept(i).dname || chr(9) ||
+											 '부서위치 = ' || v_dept(i).loc);
+end loop;				
+	exception when others then
+		dbms_output.put_line('에러');
+		
+end;
+
+/*
+	C. 제어문(if, case)
+	
+	1. 단순 if : if ~ end if;
+	2. if ~ then ~ else ~ end if;
+	3. if ~ elsif ~ end if;
+	4. case
+*/
+
+-- 1. 단순if 
+-- hr.employees에서 10=총무부, ....., 40=인사부
+create or replace PROCEDURE pro_12 is
+	v_emp_id						hr.employees.EMPLOYEE_ID%type;
+	v_name							hr.employees.first_name%type;
+	v_dept_id						hr.employees.DEPARTMENT_ID%type;
+	v_dname							varchar2(20);
+begin
+select employee_id, first_name || ' ' || last_name name, department_id
+into v_emp_id, v_name, v_dept_id
+from hr.EMPLOYEES
+where employee_id = 203;
+
+if(v_dept_id = 10) then
+	v_dname := '총무부';
+ end if;
+ 
+ if(v_dept_id = 20) then
+	v_dname := '마케팅';
+ end if;
+ 
+ if(v_dept_id = 30) then
+	v_dname := '구매부';
+ end if;
+ 
+ if(v_dept_id = 40) then
+	v_dname := '인사부';
+ end if;
+ 
+ dbms_output.put_line(v_name || '의 부서는 ' || v_dname || '입니다.');
+
+exception when others then
+		dbms_output.put_line('에러');
+end;
+
+-- 2. if ~ then ~ else ~ end if
+-- hr.employees에서 commission이 있으면 보너스를 지급, 없으면 지급하지 않기
+create or replace PROCEDURE pro_13 is
+	v_emp_id			hr.employees.employee_id%type;
+	v_name				hr.employees.first_name%type;
+	v_sal					hr.employees.salary%type;
+	v_comm				hr.employees.commission_pct%type;
+	v_bonus				number;
+begin
+
+select employee_id, first_name || ' ' || last_name name, salary, nvl(commission_pct, 0)
+, salary * nvl(commission_pct, 0)
+into v_emp_id, v_name, v_sal, v_comm, v_bonus
+from hr.EMPLOYEES
+where employee_id = 145;
+
+if (v_comm > 0)
+then dbms_output.put_line(v_name || ' 사원의 보너스는 ' || v_bonus || ' 입니다.');
+else dbms_output.put_line(v_name || ' 사원의 보너스는 없습니다.');
+end if;
+
+exception when others then
+		dbms_output.put_line('에러');
+end;
+
+-- 3. if ~ elsif ~ elsif ~ end if
+-- hr.employees에서 10=총무부, ....., 40=인사부
+create or replace PROCEDURE pro_14 is
+	v_emp_id						hr.employees.EMPLOYEE_ID%type;
+	v_name							hr.employees.first_name%type;
+	v_dept_id						hr.employees.DEPARTMENT_ID%type;
+	v_dname							varchar2(20);
+begin
+select employee_id, first_name || ' ' || last_name name, department_id
+into v_emp_id, v_name, v_dept_id
+from hr.EMPLOYEES
+where employee_id = 203;
+
+if(v_dept_id = 10) then
+	v_dname := '총무부';
+ 
+elsif(v_dept_id = 20) then
+	v_dname := '마케팅';
+ 
+elsif(v_dept_id = 30) then
+	v_dname := '구매부';
+ 
+elsif(v_dept_id = 40) then
+	v_dname := '인사부';
+ end if;
+ 
+ dbms_output.put_line(v_name || '의 부서는 ' || v_dname || '입니다.');
+
+exception when others then
+		dbms_output.put_line('에러');
+end;
+
+create or replace PROCEDURE pro_15 is
+	v_emp_id						hr.employees.EMPLOYEE_ID%type;
+	v_name							hr.employees.first_name%type;
+	v_dept_id						hr.employees.DEPARTMENT_ID%type;
+	v_dname							varchar2(20);
+begin
+select employee_id, first_name || ' ' || last_name name, department_id
+into v_emp_id, v_name, v_dept_id
+from hr.EMPLOYEES
+where employee_id = 203;
+
+v_dname := case v_dept_id
+when 10 then '총무부'
+when 20 then '마케팅'
+when 30 then '구매부'
+when 40 then '인사부'
+end;
+
+dbms_output.put_line(v_name || '의 부서는 ' || v_dname || '입니다.');
+
+exception when others then
+		dbms_output.put_line('에러');
+end pro_15;
+
+
+/* D. 반복문(loop, for, while)
+
+	loop -- javascript의 do while과 동일
+	end loop
+	
+	for i in 1...10 loop
+	end loop
+	
+	while 조건 loop
+	end loop
+
+*/
+-- 1. loop
+create or replace PROCEDURE pro_16 is
+	cnt 	number := 0;
+begin
+
+	loop
+		cnt := cnt + 1;
+		dbms_output.put_line('현재번호는 = ' || cnt);
+		exit when cnt >= 10;
+	end loop;
+
+exception when others then
+		dbms_output.put_line('에러');
+end pro_16;
+
+-- 2. while
+
+create or replace PROCEDURE pro_17 is
+	cnt 	number := 0;
+begin
+
+	while cnt < 10 loop
+		cnt := cnt + 1;
+		dbms_output.put_line('현재번호는 = ' || cnt);
+	end loop;
+	
+exception when others then
+		dbms_output.put_line('에러');
+end pro_17;
+
+-- 함수나 프로시저를 호출 일반적인 명령
+call pro_17();
+
+-- 3. for 
+-- for 카운트[객체리스트] in [reverse] start..end loop
+-- end loop
+-- for 객체리스트 in (select ~~) loop
+-- end loop;
+create or replace PROCEDURE pro_18 is
+begin
+
+for cnt in 1..10 loop
+	dbms_output.put_line('현재번호는 = ' || cnt);
+end loop;
+
+exception when others then
+		dbms_output.put_line('에러');
+end pro_18;
+call pro_18();
+
+
+/*
+	E. in 매개변수가 있는 procedure
+	
+	create or replace procedure 프로시저명(arg1 in 데이터타입, ... argn in 데이터타입) is
+	begin
+	end;
+*/
+-- 1. 사원번호와 급여인상율(10%)을 전달받아서 해당사원의 급여를 인상하는 procedure 생성
+create or replace procedure update_sal_emp(p_empno in number, p_percent in number) is
+v_bef_sal			number;
+v_aft_sal 		number;
+v_ename				emp.ename%type;
+begin
+	dbms_output.put_line('사원번호는 = ' || p_empno);
+	dbms_output.put_line('인상율 = ' || p_percent);
+	
+	select sal
+	into v_bef_sal
+	from emp
+	where empno = p_empno;
+	
+	dbms_output.put_line('인상전급여 = ' || v_bef_sal);
+	
+	update emp
+	set sal = sal + (sal * p_percent / 100)
+	where empno = p_empno;
+	
+	exception when others then
+		dbms_output.put_line('에러');
+	
+	select sal
+	into v_aft_sal
+	from emp
+	where empno = p_empno;
+	
+	dbms_output.put_line('인상후급여 = ' || v_aft_sal);
+	
+	select sal, ename
+	into v_aft_sal, v_ename
+	from emp
+	where empno = p_empno;
+	
+	dbms_output.put_line('----------------------------------------------------------------------------');
+	dbms_output.put_line(v_ename || '(' || p_empno || ')' || '사원의 인상전 급여 = ' || v_bef_sal ||
+	', 인상후급여 = ' || v_aft_sal);
+	
+end update_sal_emp;
+
+call update_sal_emp(7369, 10);
+
+-- 실습. emp에서 10번부서의 사원 급여를 15%인상후 급여를 출력
+-- procedure명 : pro_sal_raise
+-- for문, type is table of 
+-- '사원번호 chr(9) 사원이름 chr(9) 인상급여'
+
+create or replace procedure pro_sal_raise(p_deptno in number, p_percent in number) is
+type t_emp is table of emp%rowtype index by binary_integer;
+v_emp 		t_emp;
+i					binary_integer := 0;
+begin
+dbms_output.put_line('부서번호 = ' || p_deptno);
+dbms_output.put_line('인상율 = ' || p_percent);
+
+update emp
+set sal = sal + (sal * p_percent / 100)
+where deptno = p_deptno;
+
+commit;
+
+for emp_list in (select * from emp where deptno = p_deptno) loop
+	i := i + 1;
+	v_emp(i) := emp_list;
+	v_emp(i).empno := emp_list.empno;
+	v_emp(i).ename := emp_list.ename;
+	v_emp(i).sal := emp_list.sal;
+end loop;
+
+
+dbms_output.put_line('=====================================');
+dbms_output.put_line('사원번호' || chr(9) || '사원이름' || chr(9) || '인상급여');
+dbms_output.put_line('=====================================');
+
+for j in 1..i loop
+	dbms_output.put_line(v_emp(j).empno || chr(9) || v_emp(j).ename || chr(9) || v_emp(j).sal);
+end loop;
+
+
+	exception when others then
+		dbms_output.put_line('에러');
+end pro_sal_raise;
+
+call pro_sal_raise(10, 15);
+call pro_sal_raise(30, 50);
+
+-- data dictionary
+-- 소유객체 목록
+select * from user_objects;
+select distinct object_type from user_objects;
+select * from user_objects where object_type = 'PROCEDURE' order by object_name;
+
+/*
+	F. in, out 매개변수가 있는 프로시저 생성하기
+	
+	create or replace procedure pro_sal_raise(p_deptno in number, p_percent out number) is
+	begin
+	end;
+*/
+-- in, out 매개변수
+-- 사원번호를 전달받아서 사원명과 급여, 직책을 리턴 procedure
+create or replace procedure emp_sal_job(
+	p_empno in number
+, p_ename out varchar2
+, p_sal out number
+, p_job out varchar2
+) is
+begin
+
+select ename, sal, job
+into p_ename, p_sal, p_job
+from emp
+where empno = p_empno;
+
+exception when others then
+	dbms_output.put_line('에러');
+
+end emp_sal_job;
+
+call emp_sal_job(7369); -- 에러 : wrong number or types of arguments in call to 'EMP_SAL_JOB'
+
+-- in, out매개변수가 있는 프로시저는 pl/sql 내부에서 사용해야 한다.
+declare
+v_ename		varchar2(20);
+v_sal		number;
+v_job   varchar2(20);
+begin
+-- 프로시저 내부에서는 exec, execute, call을 사용할 수 없고 
+-- 프로시저명으로 호출해야 한다.
+emp_sal_job(7369, v_ename, v_sal, v_job);
+dbms_output.put_line(v_ename || chr(9) || v_sal || chr(9) || v_job);
+end;
+
 
 
 
